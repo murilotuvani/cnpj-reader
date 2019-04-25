@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.cartola.receita.cnpj.model.Cadastro;
+import net.cartola.receita.cnpj.parser.CadastroParser;
 
 /**
  * 24/04/2019 00:26:37
@@ -16,6 +18,7 @@ public class CnpjReader {
 
     public static void main(String[] args) {
         File f = new File("/Users/murilo/Documents/cnpj/F.K032001K.D90308");
+        f = new File("/Users/murilotuvani/OneDrive/cnpj/sample.txt");
         if (f.exists() && f.canRead()) {
             CnpjReader c = new CnpjReader();
             c.read(f);
@@ -25,6 +28,7 @@ public class CnpjReader {
     }
 
     private void read(File f) {
+        CadastroParser cadastroParser = new CadastroParser();
         try (FileReader     fr = new FileReader(f);
              BufferedReader br = new BufferedReader(fr)) {
             String line = null;
@@ -37,6 +41,9 @@ public class CnpjReader {
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("1")) {
                     detalhe++;
+                    Cadastro cadastro = cadastroParser.parse(line);
+                    System.out.println(cadastro);
+                    System.out.flush();
                 } else if (line.startsWith("2")) {
                     socio++;
                 } else if (line.startsWith("6")) {
@@ -59,7 +66,5 @@ public class CnpjReader {
         } catch (IOException ex) {
             Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
-
 }
