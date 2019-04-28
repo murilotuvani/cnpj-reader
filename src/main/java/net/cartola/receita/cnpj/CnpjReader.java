@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.cartola.receita.cnpj.model.Cadastro;
+import net.cartola.receita.cnpj.model.Socio;
 import net.cartola.receita.cnpj.parser.CadastroParser;
+import net.cartola.receita.cnpj.parser.SocioParser;
 
 /**
  * 24/04/2019 00:26:37
@@ -29,13 +31,15 @@ public class CnpjReader {
 
     private void read(File f) {
         CadastroParser cadastroParser = new CadastroParser();
+        SocioParser socioParser = new SocioParser();
+        
         try (FileReader     fr = new FileReader(f);
              BufferedReader br = new BufferedReader(fr)) {
             String line = null;
             int header = 0;
             int detalhe = 0;
-            int cnaeSecundario = 0;
-            int socio = 0;
+            int cnaeSecundarioCount = 0;
+            int socioCount = 0;
             int trailler = 0;
             int outros = 0;
             while ((line = br.readLine()) != null) {
@@ -45,9 +49,12 @@ public class CnpjReader {
                     System.out.println(cadastro);
                     System.out.flush();
                 } else if (line.startsWith("2")) {
-                    socio++;
+                    socioCount++;
+                    Socio socio = socioParser.parse(line);
+                    System.out.println(socio);
+                    System.out.flush();
                 } else if (line.startsWith("6")) {
-                    cnaeSecundario++;
+                    cnaeSecundarioCount++;
                 } else if (line.startsWith("0")) {
                     header++;
                 } else if (line.startsWith("9")) {
@@ -58,8 +65,8 @@ public class CnpjReader {
             }
             System.out.println("Header   : " + header);
             System.out.println("Empresa  : " + detalhe);
-            System.out.println("Sócio    : " + socio);
-            System.out.println("CNAE Sec : " + cnaeSecundario);
+            System.out.println("Sócio    : " + socioCount);
+            System.out.println("CNAE Sec : " + cnaeSecundarioCount);
             System.out.println("Trailler : " + trailler);
             System.out.println("Outros   : " + outros);
             System.out.println("Header   : " + header);
