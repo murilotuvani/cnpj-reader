@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.cartola.receita.cnpj.model.Cadastro;
+import net.cartola.receita.cnpj.model.CnaeSecundario;
 import net.cartola.receita.cnpj.model.Socio;
 import net.cartola.receita.cnpj.parser.CadastroParser;
+import net.cartola.receita.cnpj.parser.CnaeSecundarioParser;
 import net.cartola.receita.cnpj.parser.SocioParser;
 
 /**
@@ -32,6 +34,7 @@ public class CnpjReader {
     private void read(File f) {
         CadastroParser cadastroParser = new CadastroParser();
         SocioParser socioParser = new SocioParser();
+        CnaeSecundarioParser cnaeSecundarioParser = new CnaeSecundarioParser();
         
         try (FileReader     fr = new FileReader(f);
              BufferedReader br = new BufferedReader(fr)) {
@@ -55,6 +58,9 @@ public class CnpjReader {
                     System.out.flush();
                 } else if (line.startsWith("6")) {
                     cnaeSecundarioCount++;
+                    CnaeSecundario cnaeSecundaria = cnaeSecundarioParser.parse(line);
+                    System.out.println(cnaeSecundaria);
+                    System.out.flush();
                 } else if (line.startsWith("0")) {
                     header++;
                 } else if (line.startsWith("9")) {
