@@ -1,5 +1,6 @@
 package net.cartola.receita.cnpj.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -30,12 +31,23 @@ public class Cadastro {
     private String uf;
     private int codigoMunicipio;
     private String municipio;
-    private String dddTelefone1;
     private String ddd1;
     private String telefone1;
-    private String dddTelefone2;
     private String ddd2;
     private String telefone2;
+    private String dddFax;
+    private String fax;
+    private String correioEletronico;
+    private String qualificacaoResponsavel;
+    private BigDecimal capitalSocial;
+    private String porte;
+    private boolean opcaoSimples;
+    private Date dataOpacaoSimples;
+    private Date dataExclusaoSimples;
+    private boolean opcaoMei;
+    private String situacaoEspecial;
+    private Date dataSiutacaoEspecial;
+    
 
     public long getCnpj() {
         return cnpj;
@@ -213,14 +225,6 @@ public class Cadastro {
         this.municipio = municipio;
     }
 
-    public String getDddTelefone1() {
-        return dddTelefone1;
-    }
-
-    public void setDddTelefone1(String dddTelefone1) {
-        this.dddTelefone1 = dddTelefone1;
-    }
-
     public String getDdd1() {
         return ddd1;
     }
@@ -235,14 +239,6 @@ public class Cadastro {
 
     public void setTelefone1(String telefone1) {
         this.telefone1 = telefone1;
-    }
-
-    public String getDddTelefone2() {
-        return dddTelefone2;
-    }
-
-    public void setDddTelefone2(String dddTelefone2) {
-        this.dddTelefone2 = dddTelefone2;
     }
 
     public String getDdd2() {
@@ -261,9 +257,105 @@ public class Cadastro {
         this.telefone2 = telefone2;
     }
 
+    public String getDddFax() {
+        return dddFax;
+    }
+
+    public void setDddFax(String dddFax) {
+        this.dddFax = dddFax;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
+
+    public String getCorreioEletronico() {
+        return correioEletronico;
+    }
+
+    public void setCorreioEletronico(String correioEletronico) {
+        this.correioEletronico = correioEletronico;
+    }
+
+    public String getQualificacaoResponsavel() {
+        return qualificacaoResponsavel;
+    }
+
+    public void setQualificacaoResponsavel(String qualificacaoResponsavel) {
+        this.qualificacaoResponsavel = qualificacaoResponsavel;
+    }
+
+    public BigDecimal getCapitalSocial() {
+        return capitalSocial;
+    }
+
+    public void setCapitalSocial(BigDecimal capitalSocial) {
+        this.capitalSocial = capitalSocial;
+    }
+
+    public String getPorte() {
+        return porte;
+    }
+
+    public void setPorte(String porte) {
+        this.porte = porte;
+    }
+
+    public boolean isOpcaoSimples() {
+        return opcaoSimples;
+    }
+
+    public void setOpcaoSimples(boolean opcaoSimples) {
+        this.opcaoSimples = opcaoSimples;
+    }
+
+    public Date getDataOpacaoSimples() {
+        return dataOpacaoSimples;
+    }
+
+    public void setDataOpacaoSimples(Date dataOpacaoSimples) {
+        this.dataOpacaoSimples = dataOpacaoSimples;
+    }
+
+    public Date getDataExclusaoSimples() {
+        return dataExclusaoSimples;
+    }
+
+    public void setDataExclusaoSimples(Date dataExclusaoSimples) {
+        this.dataExclusaoSimples = dataExclusaoSimples;
+    }
+
+    public boolean isOpcaoMei() {
+        return opcaoMei;
+    }
+
+    public void setOpcaoMei(boolean opcaoMei) {
+        this.opcaoMei = opcaoMei;
+    }
+
+    public String getSituacaoEspecial() {
+        return situacaoEspecial;
+    }
+
+    public void setSituacaoEspecial(String situacaoEspecial) {
+        this.situacaoEspecial = situacaoEspecial;
+    }
+
+    public Date getDataSiutacaoEspecial() {
+        return dataSiutacaoEspecial;
+    }
+
+    public void setDataSiutacaoEspecial(Date dataSiutacaoEspecial) {
+        this.dataSiutacaoEspecial = dataSiutacaoEspecial;
+    }
+
     @Override
     public String toString() {
-        return "Cadastro{cnpj=" + cnpj + ", unidadeTipo=" + unidadeTipo + ", razaoSocial=" + razaoSocial + ", nomeFantasia=" + nomeFantasia + ", situacaoCadastral=" + situacaoCadastral + ", dataSituacaoCadastral=" + dataSituacaoCadastral + ", motivoSituacaoCadastral=" + motivoSituacaoCadastral + ", cidadeExteriorNome=" + cidadeExteriorNome + ", paisCodigo=" + paisCodigo + ", paisNome=" + paisNome + ", codigoNaturezaJuridica=" + codigoNaturezaJuridica + ", inicioAtividade=" + inicioAtividade + ", cnae=" + cnae + ", tipoLogradouro=" + tipoLogradouro + ", logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cep=" + cep + ", uf=" + uf + ", codigoMunicipio=" + codigoMunicipio + ", municipio=" + municipio + ", dddTelefone1=" + dddTelefone1 + ", ddd1=" + ddd1 + ", telefone1=" + telefone1 + ", dddTelefone2=" + dddTelefone2 + ", ddd2=" + ddd2 + ", telefone2=" + telefone2 + '}';
+        return "Cadastro{cnpj=" + cnpj + ", unidadeTipo=" + unidadeTipo + ", razaoSocial=" + razaoSocial + ", nomeFantasia=" + nomeFantasia + ", situacaoCadastral=" + situacaoCadastral + ", dataSituacaoCadastral=" + dataSituacaoCadastral + ", motivoSituacaoCadastral=" + motivoSituacaoCadastral + ", cidadeExteriorNome=" + cidadeExteriorNome + ", paisCodigo=" + paisCodigo + ", paisNome=" + paisNome + ", codigoNaturezaJuridica=" + codigoNaturezaJuridica + ", inicioAtividade=" + inicioAtividade + ", cnae=" + cnae + ", tipoLogradouro=" + tipoLogradouro + ", logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cep=" + cep + ", uf=" + uf + ", codigoMunicipio=" + codigoMunicipio + ", municipio=" + municipio + ", ddd1=" + ddd1 + ", telefone1=" + telefone1 + ", ddd2=" + ddd2 + ", telefone2=" + telefone2 + ", dddFax=" + dddFax + ", fax=" + fax + '}';
     }
 
 }

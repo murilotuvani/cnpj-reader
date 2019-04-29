@@ -123,6 +123,97 @@ public class CadastroParser {
             iaux = Integer.parseInt(aux.trim());
             c.setCnae(iaux);
         }
+        
+        tam = 20;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setTipoLogradouro(aux.trim());
+
+        tam = 60;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setLogradouro(aux.trim());
+        
+        tam = 6;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setNumero(aux.trim());
+
+        tam = 156;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setComplemento(aux.trim());
+        
+        tam = 156;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setBairro(aux.trim());
+        
+        tam = 50;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        if (!"".equals(aux.trim())) {
+            iaux = Integer.parseInt(aux.trim());
+            c.setCep(iaux);
+        }
+        
+        tam = 2;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setUf(aux.trim());
+        
+        tam = 4;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        if (!"".equals(aux.trim())) {
+            iaux = Integer.parseInt(aux.trim());
+            c.setCodigoMunicipio(iaux);
+        }
+        
+        tam = 50;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setMunicipio(aux.trim());
+        
+        tam = 4;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setDdd1(aux.trim());
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setTelefone1(aux.trim());
+        
+        tam = 4;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setDdd2(aux.trim());
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setTelefone2(aux.trim());
+        
+        tam = 4;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setDddFax(aux.trim());
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setFax(aux.trim());
+        
+        tam = 115;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setCorreioEletronico(aux.trim());
+        
+        tam = 2;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setQualificacaoResponsavel(linha);
 
         return c;
     }
