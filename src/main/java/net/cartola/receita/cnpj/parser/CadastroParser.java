@@ -1,5 +1,6 @@
 package net.cartola.receita.cnpj.parser;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -144,12 +145,12 @@ public class CadastroParser {
         pos += tam;
         c.setComplemento(aux.trim());
         
-        tam = 156;
+        tam = 50;
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         c.setBairro(aux.trim());
         
-        tam = 50;
+        tam = 8;
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
@@ -213,7 +214,72 @@ public class CadastroParser {
         tam = 2;
         aux = linha.substring(pos, pos + tam);
         pos += tam;
-        c.setQualificacaoResponsavel(linha);
+        c.setQualificacaoResponsavel(aux.trim());
+        
+        tam = 14;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setCapitalSocial(new BigDecimal(aux.trim()));
+        
+        tam = 2;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setPorte(aux.trim());
+        
+        tam = 1;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        if (!"".equals(aux.trim())) {
+            iaux = Integer.parseInt(aux.trim());
+            c.setOpcaoSimples(iaux);
+        }
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        if (!"00000000".equals(aux.trim())) {
+            try {
+                data = SDF_YYYYMMDD.parse(aux);
+                c.setDataOpacaoSimples(data);
+            } catch (ParseException ex) {
+                Logger.getLogger(CadastroParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        if (!"00000000".equals(aux.trim())) {
+            try {
+                data = SDF_YYYYMMDD.parse(aux);
+                c.setDataExclusaoSimples(data);
+            } catch (ParseException ex) {
+                Logger.getLogger(CadastroParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        tam = 1;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setOpcaoMei("S".equals(aux));
+        
+        tam = 23;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        c.setSituacaoEspecial(aux.trim());
+        
+        tam = 8;
+        aux = linha.substring(pos, pos + tam);
+        pos += tam;
+        
+        if (!"".equals(aux.trim()) && !"00000000".equals(aux.trim())) {
+            try {
+                data = SDF_YYYYMMDD.parse(aux);
+                c.setDataSiutacaoEspecial(data);
+            } catch (ParseException ex) {
+                Logger.getLogger(CadastroParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         return c;
     }

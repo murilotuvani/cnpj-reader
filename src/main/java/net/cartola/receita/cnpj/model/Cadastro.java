@@ -1,14 +1,17 @@
 package net.cartola.receita.cnpj.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 24/04/2019 23:05:00
+ *
  * @author murilotuvani
  */
 public class Cadastro {
-    
+
     private long cnpj;
     private UnidadeTipo unidadeTipo = UnidadeTipo.MATRIZ;
     private String razaoSocial;
@@ -41,13 +44,15 @@ public class Cadastro {
     private String qualificacaoResponsavel;
     private BigDecimal capitalSocial;
     private String porte;
-    private boolean opcaoSimples;
+    private int opcaoSimples;
     private Date dataOpacaoSimples;
     private Date dataExclusaoSimples;
     private boolean opcaoMei;
     private String situacaoEspecial;
     private Date dataSiutacaoEspecial;
-    
+
+    private List<CnaeSecundario> cnaesSecundarios;
+    private List<Socio> socios;
 
     public long getCnpj() {
         return cnpj;
@@ -305,11 +310,11 @@ public class Cadastro {
         this.porte = porte;
     }
 
-    public boolean isOpcaoSimples() {
+    public int getOpcaoSimples() {
         return opcaoSimples;
     }
 
-    public void setOpcaoSimples(boolean opcaoSimples) {
+    public void setOpcaoSimples(int opcaoSimples) {
         this.opcaoSimples = opcaoSimples;
     }
 
@@ -329,7 +334,7 @@ public class Cadastro {
         this.dataExclusaoSimples = dataExclusaoSimples;
     }
 
-    public boolean isOpcaoMei() {
+    public boolean getOpcaoMei() {
         return opcaoMei;
     }
 
@@ -353,9 +358,39 @@ public class Cadastro {
         this.dataSiutacaoEspecial = dataSiutacaoEspecial;
     }
 
+    public List<CnaeSecundario> getCnaesSecundarios() {
+        return cnaesSecundarios;
+    }
+
+    public void setCnaesSecundarios(List<CnaeSecundario> cnaesSecundarios) {
+        this.cnaesSecundarios = cnaesSecundarios;
+    }
+
+    public List<Socio> getSocios() {
+        return socios;
+    }
+
+    public void setSocios(List<Socio> socios) {
+        this.socios = socios;
+    }
+
     @Override
     public String toString() {
         return "Cadastro{cnpj=" + cnpj + ", unidadeTipo=" + unidadeTipo + ", razaoSocial=" + razaoSocial + ", nomeFantasia=" + nomeFantasia + ", situacaoCadastral=" + situacaoCadastral + ", dataSituacaoCadastral=" + dataSituacaoCadastral + ", motivoSituacaoCadastral=" + motivoSituacaoCadastral + ", cidadeExteriorNome=" + cidadeExteriorNome + ", paisCodigo=" + paisCodigo + ", paisNome=" + paisNome + ", codigoNaturezaJuridica=" + codigoNaturezaJuridica + ", inicioAtividade=" + inicioAtividade + ", cnae=" + cnae + ", tipoLogradouro=" + tipoLogradouro + ", logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cep=" + cep + ", uf=" + uf + ", codigoMunicipio=" + codigoMunicipio + ", municipio=" + municipio + ", ddd1=" + ddd1 + ", telefone1=" + telefone1 + ", ddd2=" + ddd2 + ", telefone2=" + telefone2 + ", dddFax=" + dddFax + ", fax=" + fax + '}';
+    }
+
+    public boolean addSocio(Socio socio) {
+        if (this.socios == null) {
+            this.socios = new ArrayList<>();
+        }
+        return this.socios.add(socio);
+    }
+
+    public boolean addCnaeSecundaria(CnaeSecundario cnaeSecundaria) {
+        if (this.cnaesSecundarios == null) {
+            this.cnaesSecundarios = new ArrayList<>();
+        }
+        return this.cnaesSecundarios.add(cnaeSecundaria);
     }
 
 }
