@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.cartola.receita.cnpj.model.Cadastro;
@@ -34,6 +36,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
  * @author murilo
  */
 public class CnpjReader {
+    
+    private ExecutorService executor;
 
     public static void main(String[] args) {
         File f = new File("/Users/murilo/Documents/cnpj/F.K032001K.D90308");
@@ -51,6 +55,10 @@ public class CnpjReader {
         } else {
             System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
         }
+    }
+
+    public CnpjReader() {
+        this.executor = Executors.newFixedThreadPool(20);
     }
 
     private void read(File f) {
@@ -113,6 +121,7 @@ public class CnpjReader {
             if (!mapa.isEmpty()) {
                 send(mapa);
             }
+            
             System.out.println("Header   : " + header);
             System.out.println("Empresa  : " + detalhe);
             System.out.println("Sócio    : " + socioCount);
@@ -124,6 +133,10 @@ public class CnpjReader {
             System.out.println("Header   : " + header);
         } catch (IOException ex) {
             Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+            System.out.println("Aguardando o fim das threads");
         }
     }
 
@@ -157,8 +170,10 @@ public class CnpjReader {
                 Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
             }
         };
-        Thread t = new Thread(r);
-        t.start();
+        
+        executor.execute(r);
+//        Thread t = new Thread(r);
+//        t.start();
     }
     
     public static ByteArrayOutputStream getResponseBody(HttpMethod method) throws IOException {
