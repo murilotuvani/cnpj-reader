@@ -37,7 +37,7 @@ public class CnpjReader {
 
     public static void main(String[] args) {
         File f = new File("/Users/murilo/Documents/cnpj/F.K032001K.D90308");
-        f = new File("/Users/murilotuvani/OneDrive/cnpj/sample.txt");
+//        f = new File("/Users/murilotuvani/OneDrive/cnpj/sample.txt");
         if (f.exists() && f.canRead()) {
             CnpjReader c = new CnpjReader();
             if (Boolean.parseBoolean(System.getProperty("clear", "true"))) {
@@ -69,7 +69,7 @@ public class CnpjReader {
             int socioSemEmpresaCount = 0;
             int trailler = 0;
             int outros = 0;
-            int limite = Integer.parseInt(System.getProperty("registros.limite", "2"));
+            int limite = Integer.parseInt(System.getProperty("registros.limite", "10"));
             Map<Long, Cadastro> mapa = new HashMap<>();
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("1")) {
@@ -80,8 +80,8 @@ public class CnpjReader {
                     }
                     Cadastro cadastro = cadastroParser.parse(line);
                     mapa.put(cadastro.getCnpj(), cadastro);
-                    System.out.println(cadastro);
-                    System.out.flush();
+//                    System.out.println(cadastro);
+//                    System.out.flush();
                 } else if (line.startsWith("2")) {
                     socioCount++;
                     Socio socio = socioParser.parse(line);
@@ -127,28 +127,38 @@ public class CnpjReader {
         }
     }
 
-    private void send(Map<Long, Cadastro> mapa) throws UnsupportedEncodingException, IOException {
-        List<Cadastro> cadastros = new ArrayList<>(mapa.values());
-        CnpjSerializer serializer = new CnpjSerializer();
-        String json = serializer.toJson(cadastros);
-        String url = System.getProperty("server", "http://localhost:8080") + "/api/cnpj/list";
-        PutMethod putMethod = new PutMethod(url);
-        putMethod.addRequestHeader("Accept", "application/json");
-        putMethod.addRequestHeader("Content-type", "application/json");
-        
-        RequestEntity requestEntity = new StringRequestEntity(json, "application/json", "UTF-8");
-        putMethod.setRequestEntity(requestEntity);
-        HttpClient client = new HttpClient();
-        int response = client.executeMethod(putMethod);
-        if (response == 200) {
-            System.out.println("Registros criados");
-        } else {
-            System.out.println("Http Code : "+response);
-            ByteArrayOutputStream baos = getResponseBody(putMethod);
-            String responseBody = baos.toString();
-            System.out.println(responseBody);
-        }
-        System.out.print(json);
+    private void send(final Map<Long, Cadastro> mapa) {
+        Runnable r = () -> {
+            try {
+                List<Cadastro> cadastros = new ArrayList<>(mapa.values());
+                CnpjSerializer serializer = new CnpjSerializer();
+                String json = serializer.toJson(cadastros);
+                String url = System.getProperty("server", "http://localhost:8080") + "/api/cnpj/list";
+                PutMethod putMethod = new PutMethod(url);
+                putMethod.addRequestHeader("Accept", "application/json");
+                putMethod.addRequestHeader("Content-type", "application/json");
+                
+                RequestEntity requestEntity = new StringRequestEntity(json, "application/json", "UTF-8");
+                putMethod.setRequestEntity(requestEntity);
+                HttpClient client = new HttpClient();
+                int response = client.executeMethod(putMethod);
+                if (response == 200) {
+                    System.out.println("Registros criados");
+                } else {
+                    System.out.println("Http Code : " + response);
+                    ByteArrayOutputStream baos = getResponseBody(putMethod);
+                    String responseBody = baos.toString();
+                    System.out.println(responseBody);
+                }
+//                System.out.print(json);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
     }
     
     public static ByteArrayOutputStream getResponseBody(HttpMethod method) throws IOException {
