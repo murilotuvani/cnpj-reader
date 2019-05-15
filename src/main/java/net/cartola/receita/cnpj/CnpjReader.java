@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import net.cartola.receita.cnpj.parser.SocioParser;
 import net.cartola.receita.cnpj.serializer.CnpjSerializer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
@@ -38,6 +40,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 public class CnpjReader {
     
     private ExecutorService executor;
+    private HttpClient client;
 
     public static void main(String[] args) {
         File f = new File("/Users/murilo/Documents/cnpj/F.K032001K.D90308");
@@ -59,6 +62,8 @@ public class CnpjReader {
 
     public CnpjReader() {
         this.executor = Executors.newFixedThreadPool(20);
+        MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
+        this.client   = new HttpClient(connectionManager);
     }
 
     private void read(File f) {
@@ -66,9 +71,8 @@ public class CnpjReader {
         SocioParser socioParser = new SocioParser();
         CnaeSecundarioParser cnaeSecundarioParser = new CnaeSecundarioParser();
 
-        try (FileReader fr = new FileReader(f);
-                BufferedReader br = new BufferedReader(fr)) {
-            String line = null;
+        try (FileReader     fr = new FileReader(f);
+             BufferedReader br = new BufferedReader(fr)) {
             int header = 0;
             int detalhe = 0;
             int cnaeSecundarioCount = 0;
@@ -78,7 +82,10 @@ public class CnpjReader {
             int trailler = 0;
             int outros = 0;
             int limite = Integer.parseInt(System.getProperty("registros.limite", "10"));
+            
             Map<Long, Cadastro> mapa = new HashMap<>();
+            String line;
+            
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("1")) {
                     detalhe++;
@@ -88,8 +95,9 @@ public class CnpjReader {
                     }
                     Cadastro cadastro = cadastroParser.parse(line);
                     mapa.put(cadastro.getCnpj(), cadastro);
-//                    System.out.println(cadastro);
-//                    System.out.flush();
+                    if (detalhe % 1000 == 0) {
+                        System.out.println("CNPJs processados : " + detalhe);
+                    }
                 } else if (line.startsWith("2")) {
                     socioCount++;
                     Socio socio = socioParser.parse(line);
@@ -98,8 +106,6 @@ public class CnpjReader {
                     } else {
                         socioSemEmpresaCount++;
                     }
-                    System.out.println(socio);
-                    System.out.flush();
                 } else if (line.startsWith("6")) {
                     cnaeSecundarioCount++;
                     CnaeSecundario cnaeSecundaria = cnaeSecundarioParser.parse(line);
@@ -108,8 +114,6 @@ public class CnpjReader {
                     } else {
                         cnaeSecundarioSemEmpresaCount++;
                     }
-                    System.out.println(cnaeSecundaria);
-                    System.out.flush();
                 } else if (line.startsWith("0")) {
                     header++;
                 } else if (line.startsWith("9")) {
@@ -140,6 +144,10 @@ public class CnpjReader {
         }
     }
 
+    /**
+     * @see http://hc.apache.org/httpclient-3.x/performance.html
+     * @param mapa 
+     */
     private void send(final Map<Long, Cadastro> mapa) {
         Runnable r = () -> {
             try {
@@ -153,17 +161,15 @@ public class CnpjReader {
                 
                 RequestEntity requestEntity = new StringRequestEntity(json, "application/json", "UTF-8");
                 putMethod.setRequestEntity(requestEntity);
-                HttpClient client = new HttpClient();
+                
                 int response = client.executeMethod(putMethod);
-                if (response == 200) {
-                    System.out.println("Registros criados");
-                } else {
+                if (response != 200) {
                     System.out.println("Http Code : " + response);
                     ByteArrayOutputStream baos = getResponseBody(putMethod);
                     String responseBody = baos.toString();
                     System.out.println(responseBody);
                 }
-//                System.out.print(json);
+                putMethod.releaseConnection();
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -172,6 +178,15 @@ public class CnpjReader {
         };
         
         executor.execute(r);
+        
+        while (Thread.activeCount() > 100) {
+            System.out.println("Too many threads : " + new Date());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 //        Thread t = new Thread(r);
 //        t.start();
     }
@@ -196,7 +211,6 @@ public class CnpjReader {
         method.addRequestHeader("Accept", "application/json");
         method.addRequestHeader("Content-type", "application/json");
 
-        HttpClient client = new HttpClient();
         int response = client.executeMethod(method);
         if (response == 200) {
             System.out.println("Registros criados");
