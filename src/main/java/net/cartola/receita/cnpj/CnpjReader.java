@@ -43,21 +43,23 @@ public class CnpjReader {
     private HttpClient client;
 
     public static void main(String[] args) {
-        File f = new File("/Users/murilo/Documents/cnpj/F.K032001K.D90308");
-//        f = new File("/Users/murilotuvani/OneDrive/cnpj/sample.txt");
-        f = new File("C:\\Users\\Murilo Moraes Tuvani\\Documents\\cnpj\\F.K032001K.D90308");
-        if (f.exists() && f.canRead()) {
-            CnpjReader c = new CnpjReader();
-            if (Boolean.parseBoolean(System.getProperty("clear", "true"))) {
-                try {
-                    c.clear();
-                } catch (IOException ex) {
-                    Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+        if (args.length > 0) {
+            File f = new File(args[0]);
+            if (f.exists() && f.canRead()) {
+                CnpjReader c = new CnpjReader();
+                if (Boolean.parseBoolean(System.getProperty("clear", "true"))) {
+                    try {
+                        c.clear();
+                    } catch (IOException ex) {
+                        Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
+                c.read(f);
+            } else {
+                System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
             }
-            c.read(f);
         } else {
-            System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
+            System.out.println("Infore o nome do arquivo a ser processado");
         }
     }
 
