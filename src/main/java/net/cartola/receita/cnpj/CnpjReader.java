@@ -47,7 +47,7 @@ public class CnpjReader {
             File f = new File(args[0]);
             if (f.exists() && f.canRead()) {
                 CnpjReader c = new CnpjReader();
-                if (Boolean.parseBoolean(System.getProperty("clear", "true"))) {
+                if (Boolean.parseBoolean(System.getProperty("clear", "false"))) {
                     try {
                         c.clear();
                     } catch (IOException ex) {

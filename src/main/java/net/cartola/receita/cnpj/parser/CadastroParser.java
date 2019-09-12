@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.cartola.receita.cnpj.model.Cadastro;
@@ -78,7 +80,7 @@ public class CadastroParser {
         tam = 2;
         aux = linha.substring(pos, pos + tam);
         pos += tam;
-        iaux = Integer.parseInt(aux);
+        iaux = Integer.parseInt(somenteNumeros(aux));
         c.setMotivoSituacaoCadastral(iaux);
 
         tam = 55;
@@ -90,7 +92,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setPaisCodigo(iaux);
         }
 
@@ -103,7 +105,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setCodigoNaturezaJuridica(iaux);
         }
 
@@ -121,7 +123,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setCnae(iaux);
         }
         
@@ -154,7 +156,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setCep(iaux);
         }
         
@@ -167,7 +169,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setCodigoMunicipio(iaux);
         }
         
@@ -230,7 +232,7 @@ public class CadastroParser {
         aux = linha.substring(pos, pos + tam);
         pos += tam;
         if (!"".equals(aux.trim())) {
-            iaux = Integer.parseInt(aux.trim());
+            iaux = Integer.parseInt(somenteNumeros(aux.trim()));
             c.setOpcaoSimples(iaux);
         }
         
@@ -282,5 +284,39 @@ public class CadastroParser {
         }
 
         return c;
+    }
+    
+    public boolean isNull(String str) {
+        return (str == null || str.trim().equals(""));
+    }
+    
+    public String somenteNumeros(String string) {
+        return somenteNumeros(string, null);
+    }
+
+    public String somenteNumeros(String string, char... ignorados) {
+        if (isNull(string)) {
+            return string;
+        }
+
+        Set<Character> ignoradosSet = new HashSet<>();
+        if (ignorados != null) {
+            for (char c : ignorados) {
+                ignoradosSet.add(c);
+            }
+        }
+        char[] characters = string.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char character : characters) {
+            if (ignorados != null) {
+                if (ignoradosSet.contains(character)) {
+                    sb.append(character);
+                }
+            }
+            if (Character.isDigit(character)) {
+                sb.append(character);
+            }
+        }
+        return sb.toString();
     }
 }
