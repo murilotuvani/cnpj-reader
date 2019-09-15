@@ -8,13 +8,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.cartola.receita.cnpj.model.Cadastro;
@@ -70,6 +72,7 @@ public class CnpjReader {
     }
 
     private void read(File f) {
+        LocalDateTime antes = LocalDateTime.now();
         CadastroParser cadastroParser = new CadastroParser();
         SocioParser socioParser = new SocioParser();
         CnaeSecundarioParser cnaeSecundarioParser = new CnaeSecundarioParser();
@@ -138,6 +141,19 @@ public class CnpjReader {
             System.out.println("Trailler : " + trailler);
             System.out.println("Outros   : " + outros);
             System.out.println("Header   : " + header);
+            
+            LocalDateTime depois = LocalDateTime.now();
+            Duration dur = Duration.between(antes, depois);
+            long millis = dur.toMillis();
+
+            System.out.println("Duração  : " + String.format("%02d:%02d:%02d",
+                    TimeUnit.MILLISECONDS.toHours(millis),
+                    TimeUnit.MILLISECONDS.toMinutes(millis)
+                    - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                    TimeUnit.MILLISECONDS.toSeconds(millis)
+                    - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))));
+            
+            
         } catch (IOException ex) {
             Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
         }
