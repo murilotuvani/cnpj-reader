@@ -46,19 +46,21 @@ public class CnpjReader {
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            File f = new File(args[0]);
-            if (f.exists() && f.canRead()) {
-                CnpjReader c = new CnpjReader();
-                if (Boolean.parseBoolean(System.getProperty("clear", "false"))) {
-                    try {
-                        c.clear();
-                    } catch (IOException ex) {
-                        Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            CnpjReader c = new CnpjReader();
+            if (Boolean.parseBoolean(System.getProperty("clear", "false"))) {
+                try {
+                    c.clear();
+                } catch (IOException ex) {
+                    Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                c.read(f);
-            } else {
-                System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
+            }
+            for (String arg : args) {
+                File f = new File(arg);
+                if (f.exists() && f.canRead()) {
+                    c.read(f);
+                } else {
+                    System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
+                }
             }
         } else {
             System.out.println("Infore o nome do arquivo a ser processado");
