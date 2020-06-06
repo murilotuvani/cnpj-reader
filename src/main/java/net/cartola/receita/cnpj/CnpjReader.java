@@ -40,27 +40,36 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
  * @author murilo
  */
 public class CnpjReader {
-    
+
     private ExecutorService executor;
     private HttpClient client;
 
     public static void main(String[] args) {
         if (args.length > 0) {
+            File f = new File(args[0]);
             CnpjReader c = new CnpjReader();
-            if (Boolean.parseBoolean(System.getProperty("clear", "false"))) {
-                try {
-                    c.clear();
-                } catch (IOException ex) {
-                    Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            for (String arg : args) {
-                File f = new File(arg);
-                if (f.exists() && f.canRead()) {
-                    c.read(f);
+            c.limpar();
+            
+            if (f.exists() && f.canRead()) {
+                if (f.isDirectory()) {
+                    File[] fs = f.listFiles((pathname) -> {
+                        return pathname.getName().startsWith("K32"); 
+                    });
+                    for (File nf : fs) {
+                        System.out.println("Importará : " + nf.getAbsolutePath());
+                    }
+                    for (File nf : fs) {
+                        if (nf.isFile() && nf.canRead()) {
+                            c.read(nf);
+                            c.excluirAposLeitura(f);
+                        }
+                    }
                 } else {
-                    System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
+                    c.read(f);
+                    c.excluirAposLeitura(f);
                 }
+            } else {
+                System.out.println("Nao encontrou o arquivo : " + f.getAbsolutePath());
             }
         } else {
             System.out.println("Infore o nome do arquivo a ser processado");
@@ -70,7 +79,7 @@ public class CnpjReader {
     public CnpjReader() {
         this.executor = Executors.newFixedThreadPool(20);
         MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-        this.client   = new HttpClient(connectionManager);
+        this.client = new HttpClient(connectionManager);
     }
 
     private void read(File f) {
@@ -78,9 +87,11 @@ public class CnpjReader {
         CadastroParser cadastroParser = new CadastroParser();
         SocioParser socioParser = new SocioParser();
         CnaeSecundarioParser cnaeSecundarioParser = new CnaeSecundarioParser();
+        
+        System.out.println("Lendo o arquvio : " + f.getAbsolutePath());
 
-        try (FileReader     fr = new FileReader(f);
-             BufferedReader br = new BufferedReader(fr)) {
+        try (FileReader fr = new FileReader(f);
+                BufferedReader br = new BufferedReader(fr)) {
             int header = 0;
             int detalhe = 0;
             int cnaeSecundarioCount = 0;
@@ -90,10 +101,10 @@ public class CnpjReader {
             int trailler = 0;
             int outros = 0;
             int limite = Integer.parseInt(System.getProperty("registros.limite", "10"));
-            
+
             Map<Long, Cadastro> mapa = new HashMap<>();
             String line;
-            
+
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("1")) {
                     detalhe++;
@@ -133,7 +144,8 @@ public class CnpjReader {
             if (!mapa.isEmpty()) {
                 send(mapa);
             }
-            
+
+            System.out.println("Leu o arquvio : " + f.getAbsolutePath());
             System.out.println("Header   : " + header);
             System.out.println("Empresa  : " + detalhe);
             System.out.println("Sócio    : " + socioCount);
@@ -143,7 +155,7 @@ public class CnpjReader {
             System.out.println("Trailler : " + trailler);
             System.out.println("Outros   : " + outros);
             System.out.println("Header   : " + header);
-            
+
             LocalDateTime depois = LocalDateTime.now();
             Duration dur = Duration.between(antes, depois);
             long millis = dur.toMillis();
@@ -154,8 +166,7 @@ public class CnpjReader {
                     - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
                     TimeUnit.MILLISECONDS.toSeconds(millis)
                     - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))));
-            
-            
+
         } catch (IOException ex) {
             Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -167,7 +178,7 @@ public class CnpjReader {
 
     /**
      * @see http://hc.apache.org/httpclient-3.x/performance.html
-     * @param mapa 
+     * @param mapa
      */
     private void send(final Map<Long, Cadastro> mapa) {
         Runnable r = () -> {
@@ -179,10 +190,10 @@ public class CnpjReader {
                 PutMethod putMethod = new PutMethod(url);
                 putMethod.addRequestHeader("Accept", "application/json");
                 putMethod.addRequestHeader("Content-type", "application/json");
-                
+
                 RequestEntity requestEntity = new StringRequestEntity(json, "application/json", "UTF-8");
                 putMethod.setRequestEntity(requestEntity);
-                
+
                 int response = client.executeMethod(putMethod);
                 if (response != 200) {
                     System.out.println("Http Code : " + response);
@@ -198,17 +209,14 @@ public class CnpjReader {
                 Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
             }
         };
-        
+
         Thread t = new Thread(r);
         t.start();
-        
+
         try {
             t.join();
-            
-            
-            
+
 //        executor.execute(r);
-        
 //        while (Thread.activeCount() > 100) {
 //            System.out.println("Too many threads : " + new Date());
 //            try {
@@ -223,7 +231,7 @@ public class CnpjReader {
             Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static ByteArrayOutputStream getResponseBody(HttpMethod method) throws IOException {
         InputStream input = method.getResponseBodyAsStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -247,6 +255,22 @@ public class CnpjReader {
         int response = client.executeMethod(method);
         if (response == 200) {
             System.out.println("Registros criados");
+        }
+    }
+
+    private void limpar() {
+        if (Boolean.parseBoolean(System.getProperty("clear", "false"))) {
+            try {
+                clear();
+            } catch (IOException ex) {
+                Logger.getLogger(CnpjReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void excluirAposLeitura(File f) {
+        if (Boolean.parseBoolean(System.getProperty("delete", "false"))) {
+            f.delete();
         }
     }
 }
